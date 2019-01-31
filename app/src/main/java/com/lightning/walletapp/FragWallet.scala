@@ -289,7 +289,7 @@ class FragWalletWorker(val host: WalletActivity, frag: View) extends SearchBar w
       val viewShareBody = detailsWrapper.findViewById(R.id.viewShareBody).asInstanceOf[Button]
 
       viewTxOutside setOnClickListener onButtonTap {
-        val uri = Uri parse s"https://smartbit.com.au/tx/$txid"
+        val uri = Uri parse s"https://testnet.smartbit.com.au/tx/$txid"
         host startActivity new Intent(Intent.ACTION_VIEW, uri)
       }
 
@@ -442,7 +442,7 @@ class FragWalletWorker(val host: WalletActivity, frag: View) extends SearchBar w
       }
 
       viewTxOutside setOnClickListener onButtonTap {
-        val uri = Uri parse s"https://smartbit.com.au/tx/$txid"
+        val uri = Uri parse s"https://testnet.smartbit.com.au/tx/$txid"
         host startActivity new Intent(Intent.ACTION_VIEW, uri)
       }
 

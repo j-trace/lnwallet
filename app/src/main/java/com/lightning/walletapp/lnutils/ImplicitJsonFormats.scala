@@ -364,7 +364,6 @@ object ImplicitJsonFormats extends DefaultJsonProtocol { me =>
   implicit val cloudSnapshot = jsonFormat[Vector[ClearToken], String, CloudSnapshot](CloudSnapshot.apply, "tokens", "url")
   implicit val cloudDataFmt = jsonFormat[Option[RequestAndMemo], Vector[ClearToken], Vector[CloudAct], CloudData](CloudData.apply, "info", "tokens", "acts")
   implicit val ratesFmt = jsonFormat[Seq[Double], Seq[Double], Fiat2Btc, Long, Rates](Rates.apply, "feesSix", "feesThree", "exchange", "stamp")
-  implicit val topNodesFmt = jsonFormat[StringVec, Long, TopNodes](TopNodes.apply, "nodes", "stamp")
 
   implicit val gDriveBackup =
     taggedJsonFmt(jsonFormat[Vector[HasCommitments], Vector[CloudSnapshot], Int,

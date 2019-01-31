@@ -49,7 +49,7 @@ import java.io.File
 
 
 class WalletApp extends Application { me =>
-  lazy val params = org.bitcoinj.params.MainNetParams.get
+  lazy val params = org.bitcoinj.params.TestNet3Params.get
   lazy val prefs = getSharedPreferences("prefs", Context.MODE_PRIVATE)
   lazy val walletFile = new File(getFilesDir, walletFileName)
   lazy val chainFile = new File(getFilesDir, chainFileName)
@@ -149,7 +149,7 @@ class WalletApp extends Application { me =>
 
     def fundingPubScript(some: HasCommitments) = singletonList(some.commitments.commitInput.txOut.publicKeyScript: org.bitcoinj.script.Script)
     def closingPubKeyScripts(cd: ClosingData) = cd.commitTxs.flatMap(_.txOut).map(_.publicKeyScript: org.bitcoinj.script.Script).asJava
-    def useCheckPoints(time: Long) = CheckpointManager.checkpoint(params, getAssets open "checkpoints.txt", store, time)
+    def useCheckPoints(time: Long) = CheckpointManager.checkpoint(params, getAssets open "checkpoints-testnet.txt", store, time)
 
     def sign(unsigned: SendRequest) = {
       // Create a tx ready for broadcast
@@ -166,8 +166,6 @@ class WalletApp extends Application { me =>
       wallet.addTransactionConfidenceEventListener(ChannelManager.chainEventsListener)
       peerGroup.addDisconnectedEventListener(ChannelManager.chainEventsListener)
 
-      // Speed up initial connection by using a random top node
-      Future(peerGroup addAddress TopNodes.randomPeerAddress)
       peerGroup addPeerDiscovery new DnsDiscovery(params)
       peerGroup.setMinRequiredProtocolVersion(70015)
       peerGroup.setDownloadTxDependencies(0)

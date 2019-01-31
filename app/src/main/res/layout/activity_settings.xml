@@ -22,6 +22,7 @@
 
     <CheckBox
         style="@style/Info"
+        android:visibility="gone"
         android:layout_marginTop="25dp"
         android:layout_gravity="center"
         android:id="@+id/gDriveBackups"
@@ -31,12 +32,11 @@
 
     <TextView
         style="@style/Info"
+        android:visibility="gone"
         android:layout_gravity="center"
         android:layout_marginBottom="25dp"
         android:id="@+id/gDriveBackupState"
         android:layout_width="wrap_content"/>
-
-    <View style="@style/GrayDivider"/>
 
     <Button
         style="@style/TransButton"
