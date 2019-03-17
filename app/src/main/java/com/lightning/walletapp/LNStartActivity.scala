@@ -141,8 +141,7 @@ sealed trait LNUrlData { def unsafe(request: String) = get(request, true).trustA
 case class IncomingChannelRequest(uri: String, callback: String, k1: String, capacity: Long, push: Long) extends LNUrlData {
 
   val nodeLink(key, host, port) = uri
-  val pubkey = PublicKey(ByteVector.fromValidHex(key), checkValid = true)
-  def resolveAnnounce = app.mkNodeAnnouncement(pubkey, NodeAddress.fromParts(host, port.toInt), host)
+  def resolveAnnounce = app.mkNodeAnnouncement(PublicKey(ByteVector fromValidHex key), NodeAddress.fromParts(host, port.toInt), host)
   def requestChannel = unsafe(s"$callback?k1=$k1&remoteid=${LNParams.nodePublicKey.toString}&private=1")
 }
 
