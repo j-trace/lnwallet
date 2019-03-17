@@ -8,6 +8,7 @@ import com.lightning.walletapp.ln.Tools.{random, runAnd}
 import com.lightning.walletapp.lnutils.olympus.CloudData
 import android.content.Context
 import android.net.Uri
+import scodec.bits.ByteVector
 
 
 object OlympusTable extends Table {
@@ -158,9 +159,13 @@ class LNOpenHelper(context: Context, name: String)
 extends SQLiteOpenHelper(context, name, null, 7) {
 
   val base = getWritableDatabase
-  // Note: ByteVector and PublicKey should *always* yield HEX strings for this to work
-  def change(sql: String, params: Any*) = base.execSQL(sql, params.map(_.toString).toArray)
-  def select(sql: String, params: Any*) = base.rawQuery(sql, params.map(_.toString).toArray)
+  val asString: Any => String = {
+    case byteVec: ByteVector => byteVec.toHex
+    case otherwise => otherwise.toString
+  }
+
+  def change(sql: String, params: Any*) = base.execSQL(sql, params.map(asString).toArray)
+  def select(sql: String, params: Any*) = base.rawQuery(sql, params.map(asString).toArray)
   def sqlPath(tbl: String) = Uri parse s"sqlite://com.lightning.wallet/table/$tbl"
 
   def txWrap(run: => Unit) = try {
