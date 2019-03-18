@@ -337,8 +337,7 @@ class WalletActivity extends NfcReaderActivity with ScanActivity { me =>
           else FragWallet.worker.receive(channelsWithRoutes, maxCanReceiveCapped, app.getString(ln_receive_title).html, new String) { rd =>
             awaitServiceIntent.putExtra(AwaitService.SHOW_AMOUNT, denom asString rd.pr.amount.get).setAction(AwaitService.SHOW_AMOUNT)
             ContextCompat.startForegroundService(me, awaitServiceIntent)
-            me goTo classOf[RequestActivity]
-            app.TransData.value = rd.pr
+            me PRQR rd.pr
           }
         }
 
@@ -352,6 +351,11 @@ class WalletActivity extends NfcReaderActivity with ScanActivity { me =>
         lst setDividerHeight 0
         lst setDivider null
     }
+  }
+
+  def PRQR(pr: PaymentRequest) = {
+    me goTo classOf[RequestActivity]
+    app.TransData.value = pr
   }
 
   def goSendPaymentForm(top: View) = {
