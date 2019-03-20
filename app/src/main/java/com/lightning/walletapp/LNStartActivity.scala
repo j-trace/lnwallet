@@ -70,6 +70,7 @@ class FragLNStart extends Fragment with SearchBar with HumanTimeDisplay { me =>
 
   lazy val host = me.getActivity.asInstanceOf[LNStartActivity]
   private[this] var nodes = Vector.empty[StartNodeView]
+  FragLNStart.fragment = me
 
   val worker = new ThrottledWork[String, AnnounceChansNumVec] {
     def work(nodeSearchAsk: String) = app.olympus findNodes nodeSearchAsk
