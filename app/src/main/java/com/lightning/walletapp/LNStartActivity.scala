@@ -75,8 +75,9 @@ class FragLNStart extends Fragment with SearchBar with HumanTimeDisplay { me =>
   val worker = new ThrottledWork[String, AnnounceChansNumVec] {
     def work(nodeSearchAsk: String) = app.olympus findNodes nodeSearchAsk
     def error(nodeSearchError: Throwable) = host onFail nodeSearchError
+
     def process(userQuery: String, results: AnnounceChansNumVec) = {
-      nodes = for (result <- results) yield RemoteNodeView(result)
+      nodes = for (nodeInfo <- results) yield RemoteNodeView(nodeInfo)
       host.UITask(adapter.notifyDataSetChanged).run
     }
   }
@@ -140,12 +141,18 @@ object LNUrlData {
 
 sealed trait LNUrlData { def unsafe(request: String) = get(request, true).trustAllCerts.trustAllHosts.body }
 case class IncomingChannelRequest(uri: String, callback: String, k1: String, capacity: Long, push: Long) extends LNUrlData {
-
-  val nodeLink(key, host, port) = uri
   def resolveAnnounce = app.mkNodeAnnouncement(PublicKey(ByteVector fromValidHex key), NodeAddress.fromParts(host, port.toInt), host)
   def requestChannel = unsafe(s"$callback?k1=$k1&remoteid=${LNParams.nodePublicKey.toString}&private=1")
+  require(callback contains "https://", "Not an HTTPS callback")
+  val nodeLink(key, host, port) = uri
 }
 
 case class WithdrawRequest(callback: String, k1: String, maxWithdrawable: Long, defaultDescription: String) extends LNUrlData {
   def requestWithdraw(paymentRequest: PaymentRequest) = unsafe(s"$callback?k1=$k1&pr=${PaymentRequest write paymentRequest}")
+  require(callback contains "https://", "Not an HTTPS callback")
+}
+
+case class MultipartPayment(requests: Vector[String], paymentId: String) extends LNUrlData {
+  val parsedPaymentRequests = requests.map(PaymentRequest.read).filter(_.amount.isEmpty)
+  require(parsedPaymentRequests.size > 1, "Too few additional payment requests")
 }
