@@ -25,11 +25,11 @@ object LNParams { me =>
   val minDepth = 1
 
   val maxToSelfDelay = 2016
-  val maxCltvDelta = 7 * 144L
   val minCapacitySat = 300000L
   final val dust = Satoshi(2730L)
   final val minFeeratePerKw = 253
-  final val maxHtlcValueMsat = 4000000000L
+  final val maxCltvDelta = 7 * 144L
+  final val maxHtlcValueMsat = 4150000000L
   final val maxCapacity = Satoshi(16777215L)
   final val minHtlcValue = MilliSatoshi(1000L)
 
@@ -77,9 +77,9 @@ object LNParams { me =>
   def backupFileName = s"blw${chainHash.toHex}-${cloudId.toHex}.bkup"
   def updateFeerate = for (chan <- ChannelManager.notClosing) chan process CMDFeerate(broadcaster.perKwThreeSat)
   def makeLocalParams(ann: NodeAnnouncement, theirReserve: Long, finalScriptPubKey: ByteVector, idx: Long, isFunder: Boolean) = {
-    val Seq(fund, revoke, pay, delay, htlc, sha) = for (ord <- 0L to 5L) yield derivePrivateKey(extendedNodeKey, idx :: ord :: Nil)
-    LocalParams(UInt64(maxHtlcValueMsat), theirReserve, toSelfDelay = 2016, maxAcceptedHtlcs = 25, fund.privateKey, revoke.privateKey,
-      pay.privateKey, delay.privateKey, htlc.privateKey, finalScriptPubKey, dust, shaSeed = sha256(sha.privateKey.toBin), isFunder)
+    val Seq(fund, rev, pay, delay, htlc, sha) = for (order <- 0L to 5L) yield derivePrivateKey(extendedNodeKey, idx :: order :: Nil)
+    LocalParams(UInt64(maxHtlcValueMsat * 3), theirReserve, toSelfDelay = 2016, maxAcceptedHtlcs = 25, fund.privateKey, rev.privateKey,
+      pay.privateKey, delay.privateKey, htlc.privateKey, finalScriptPubKey, dust, sha256(sha.privateKey.toBin), isFunder)
   }
 }
 
