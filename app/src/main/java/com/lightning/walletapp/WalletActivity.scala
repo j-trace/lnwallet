@@ -197,7 +197,7 @@ class WalletActivity extends NfcReaderActivity with ScanActivity { me =>
 
     case lnUrl: LNUrl =>
       if (lnUrl.isLogin) showLoginForm(lnUrl)
-      else fetch1stLevelUrl(lnUrl)(resolve1stLevelUrl)
+      else fetch1stLevelUrl(lnUrl, resolve1stLevelUrl)
       me returnToBase null
 
     case pr: PaymentRequest if PaymentRequest.prefixes(LNParams.chainHash) != pr.prefix =>
@@ -235,7 +235,7 @@ class WalletActivity extends NfcReaderActivity with ScanActivity { me =>
 
   // LNURL
 
-  def fetch1stLevelUrl(lNUrl: LNUrl)(next: LNUrlData => Unit) = {
+  def fetch1stLevelUrl(lNUrl: LNUrl, next: LNUrlData => Unit) = {
     val initialRequest = get(lNUrl.uri.toString, true).trustAllCerts.trustAllHosts
     <(to[LNUrlData](initialRequest.connectTimeout(5000).body), onFail)(next)
     app toast ln_url_resolving

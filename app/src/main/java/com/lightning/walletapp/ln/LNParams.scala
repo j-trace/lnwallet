@@ -26,6 +26,7 @@ object LNParams { me =>
 
   val maxToSelfDelay = 2016
   val minCapacitySat = 300000L
+  val minMultipartMsat = 1000000L
   final val dust = Satoshi(2730L)
   final val minFeeratePerKw = 253
   final val maxCltvDelta = 7 * 144L
