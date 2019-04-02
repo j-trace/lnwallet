@@ -47,11 +47,11 @@ object LNUrl {
 case class LNUrl(request: String) {
   val uri = android.net.Uri parse request
   lazy val challenge = Try(ByteVector.fromValidHex(uri getQueryParameter "c") take 64)
-  lazy val traits = Try(uri getQueryParameter "tag" split ",").map(_.toSet).getOrElse(Set.empty)
+  lazy val tags = Try(uri getQueryParameter "tag" split ",").map(_.toSet).getOrElse(Set.empty)
 
-  def isMultipartPayment = traits contains "multipart"
-  def isLinkablePayment = traits contains "link"
-  def isLogin = traits contains "login"
+  def isMultipartPayment = tags contains "multipart"
+  def isLinkablePayment = tags contains "link"
+  def isLogin = tags contains "login"
 }
 
 case class FallbackAddressTag(version: Byte, hash: ByteVector) extends Tag {
