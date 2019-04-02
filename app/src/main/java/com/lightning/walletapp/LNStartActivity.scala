@@ -145,19 +145,17 @@ sealed trait LNUrlData { def unsafe(request: String) = get(request, true).trustA
 case class IncomingChannelRequest(uri: String, callback: String, k1: String, capacity: Long, push: Long) extends LNUrlData {
   def resolveAnnounce = app.mkNodeAnnouncement(PublicKey(ByteVector fromValidHex key), NodeAddress.fromParts(host, port.toInt), host)
   def requestChannel = unsafe(s"$callback?k1=$k1&remoteid=${LNParams.nodePublicKey.toString}&private=1")
-  require(callback contains "https://", "Not an HTTPS callback")
   val nodeLink(key, host, port) = uri
 }
 
 case class WithdrawRequest(callback: String, k1: String, maxWithdrawable: Long, defaultDescription: String) extends LNUrlData {
   def requestWithdraw(paymentRequest: PaymentRequest) = unsafe(s"$callback?k1=$k1&pr=${PaymentRequest write paymentRequest}")
-  require(callback contains "https://", "Not an HTTPS callback")
 }
 
 case class MultipartPayment(requests: StringVec, paymentId: String) extends LNUrlData {
   val parsedPaymentRequests: PayReqVec = requests.take(5).map(PaymentRequest.read).filter(_.amount.isEmpty)
   require(parsedPaymentRequests.map(_.paymentHash).distinct.size == parsedPaymentRequests.size, "Same invoices contain the same hash")
   require(parsedPaymentRequests.forall(_.description contains paymentId), s"Some invoice descriptions do not contain $paymentId")
-  require(parsedPaymentRequests.forall(_.lnUrlOpt.isEmpty), "Some invoices contain nested LNUrls which are not allowed")
-  require(parsedPaymentRequests.size > 1, "Not enough additional invoices were found")
+  require(parsedPaymentRequests.forall(_.lnUrlOpt.isEmpty), "Some invoices contain nested LNUrls which is not allowed")
+  require(parsedPaymentRequests.size > 1, "Not enough additional invoices are found")
 }

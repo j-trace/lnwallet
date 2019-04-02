@@ -46,7 +46,6 @@ object LNUrl {
 
 case class LNUrl(request: String) {
   val uri = android.net.Uri parse request
-  require(uri.toString contains "https://", "Not an HTTPS endpoint")
   lazy val challenge = Try(ByteVector.fromValidHex(uri getQueryParameter "c") take 64)
   lazy val traits = Try(uri getQueryParameter "tag" split ",").map(_.toSet).getOrElse(Set.empty)
 
