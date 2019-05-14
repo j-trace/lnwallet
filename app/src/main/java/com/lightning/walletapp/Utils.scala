@@ -199,25 +199,35 @@ trait TimerActivity extends AppCompatActivity { me =>
 
     def onTxFail(err: Throwable): Unit = mkCheckForm(alert => rm(alert)(finish), none, txMakeErrorBuilder(err), dialog_ok, -1)
     def start(coloredAmount: String) = <(app.kit sign plainRequest(RatesSaver.rates.feeSix), onTxFail) { estimate =>
-      // Estimate a fee this tx will have in order to be confirmed within next 6 blocks, then propose chaper one
+      // Estimate a fee this tx will have in order to be confirmed within next 6 blocks, then propose cheaper one
       val livePerTxFee: MilliSatoshi = estimate.tx.getFee
       val riskyPerTxFee: MilliSatoshi = livePerTxFee / 2
+      val superRiskyTxFee: MilliSatoshi = riskyPerTxFee / 2
+      val fourthTxFee: MilliSatoshi = superRiskyTxFee / 2
 
       val inFiatLive = msatInFiatHuman(livePerTxFee)
       val inFiatRisky = msatInFiatHuman(riskyPerTxFee)
+      val inFiatSuperRisky = msatInFiatHuman(superRiskyTxFee)
+      val inFiatFourth = msatInFiatHuman(fourthTxFee)
       val markedLivePerTxFee = denom.coloredOut(livePerTxFee, denom.sign)
       val markedRiskyPerTxFee = denom.coloredOut(riskyPerTxFee, denom.sign)
+      val markedSuperRiskyPerTxFee = denom.coloredOut(superRiskyTxFee, denom.sign)
+      val markedFourth = denom.coloredOut(fourthTxFee, denom.sign)
 
       val txtFeeLive = getString(fee_live).format(markedLivePerTxFee, inFiatLive)
       val txtFeeRisky = getString(fee_risky).format(markedRiskyPerTxFee, inFiatRisky)
+      val txtFeeSuperRisky = getString(fee_risky).format(markedSuperRiskyPerTxFee, inFiatSuperRisky)
+      val txtFeeFourth = getString(fee_risky).format(markedFourth, inFiatFourth)
       val form = getLayoutInflater.inflate(R.layout.frag_input_choose_fee, null)
       val lst = form.findViewById(R.id.choiceList).asInstanceOf[ListView]
-      val feesOptions = Array(txtFeeRisky.html, txtFeeLive.html)
+      val feesOptions = Array(txtFeeFourth.html, txtFeeSuperRisky.html, txtFeeRisky.html, txtFeeLive.html)
 
       def proceed = <(lst.getCheckedItemPosition match {
         // Allow user to choose an economical fee when sending a manual transaction
-        case 0 => self futureProcess plainRequest(RatesSaver.rates.feeSix div 2)
-        case 1 => self futureProcess plainRequest(RatesSaver.rates.feeSix)
+        case 0 => self futureProcess plainRequest(RatesSaver.rates.feeSix div 8)
+        case 1 => self futureProcess plainRequest(RatesSaver.rates.feeSix div 4)
+        case 2 => self futureProcess plainRequest(RatesSaver.rates.feeSix div 2)
+        case 3 => self futureProcess plainRequest(RatesSaver.rates.feeSix)
       }, onTxFail)(none)
 
       val bld = baseBuilder(getString(step_fees).format(coloredAmount).html, form)
