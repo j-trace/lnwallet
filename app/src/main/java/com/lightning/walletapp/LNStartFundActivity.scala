@@ -131,8 +131,8 @@ class LNStartFundActivity extends TimerActivity { me =>
 
       def askLocalFundingConfirm = UITask {
         val content = getLayoutInflater.inflate(R.layout.frag_input_fiat_converter, null, false)
-        val maxCap = MilliSatoshi(math.min(app.kit.conf0Balance.value, LNParams.maxCapacity.amount) * 1000L)
-        val minCap = MilliSatoshi(math.max(LNParams.broadcaster.perKwThreeSat * 3, LNParams.minCapacitySat) * 1000L)
+        val maxCap = MilliSatoshi(LNParams.maxCapacity.amount min app.kit.conf0Balance.value * 1000L)
+        val minCap = MilliSatoshi(LNParams.minCapacityMsat max LNParams.broadcaster.perKwThreeSat * 3 * 1000L)
         val rateManager = new RateManager(content) hint getString(amount_hint_newchan).format(denom parsedWithSign minCap,
           denom parsedWithSign LNParams.maxCapacity, denom parsedWithSign app.kit.conf0Balance)
 
@@ -146,8 +146,12 @@ class LNStartFundActivity extends TimerActivity { me =>
               val dummyScript = pubKeyScript(dummyKey, dummyKey)
               val pay = P2WSHData(ms, pay2wsh = dummyScript)
 
-              def futureProcess(unsigned: SendRequest) = {
-                val batch = Batch(unsigned, dummyScript, null)
+              def onTxFail(error: Throwable): Unit =
+                mkCheckForm(alert => rm(alert)(finish), none,
+                  txMakeErrorBuilder(error), dialog_ok, -1)
+
+              def futureProcess(unsignedRequest: SendRequest) = {
+                val batch = Batch(unsignedRequest, dummyScript, null)
                 val theirReserveSat = batch.fundingAmountSat / LNParams.channelReserveToFundingRatio
                 val finalPubKeyScript = ByteVector(ScriptBuilder.createOutputScript(app.kit.currentAddress).getProgram)
                 val localParams = LNParams.makeLocalParams(ann, theirReserveSat, finalPubKeyScript, System.currentTimeMillis, isFunder = true)
