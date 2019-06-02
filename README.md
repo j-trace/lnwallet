@@ -1,4 +1,6 @@
-Direct link to APK file: https://github.com/btcontract/lnwallet/blob/master/app/app-release.apk  
+A fork to primarily lower the on-chain payment fees and decrease the min lightning channel capacity.
+
+Direct link to (original) APK file: https://github.com/btcontract/lnwallet/blob/master/app/app-release.apk  
 
 Genuine Bitcoin Lightning Wallet is ONLY available on Google Play store for now:  
 
