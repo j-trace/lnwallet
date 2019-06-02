@@ -23,7 +23,7 @@ object LNParams { me =>
   val chainHash = Block.LivenetGenesisBlock.hash
 
   val minDepth = 1
-  val minCapacityMsat = 300000000L
+  val minCapacityMsat = 100000000L
   val channelReserveToFundingRatio = 100
 
   final val dust = Satoshi(2730L)
